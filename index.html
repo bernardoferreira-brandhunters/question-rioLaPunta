@@ -513,6 +513,25 @@
 
   .btn-submit:active { transform: translateY(0); box-shadow: none; }
 
+  .btn-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ─── FORM ERROR ─────────────────────────────────────── */
+  .form-error {
+    display: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: #c0392b;
+    margin-bottom: 14px;
+  }
+
+  body[data-theme="dark"] .form-error { color: #e74c3c; }
+
   /* ─── SUCCESS ────────────────────────────────────────── */
   .success-screen {
     display: none;
@@ -588,6 +607,13 @@
       <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
       <div class="progress-label" id="prog-label">0 / 18</div>
     </div>
+
+    <!-- FORM — todas as respostas enviadas ao Formspree -->
+    <form id="questionnaire-form" novalidate>
+
+      <!-- Campos auxiliares do Formspree -->
+      <input type="hidden" name="_subject"  value="Nova resposta — Questionário Redes Sociais">
+      <input type="hidden" name="_language" value="pt">
 
     <!-- SECÇÃO 1 -->
     <div class="section">
@@ -690,8 +716,10 @@
 
     <div class="submit-area">
       <p class="note" style="margin-bottom:20px;">As tuas respostas são anónimas e usadas apenas para fins de investigação estratégica.</p>
-      <button class="btn-submit" onclick="submeter()">ENVIAR RESPOSTAS</button>
+      <button class="btn-submit" id="btn-submit" type="button" onclick="submeter()">ENVIAR RESPOSTAS</button>
     </div>
+
+    </form><!-- /questionnaire-form -->
 
   </div><!-- /form-area -->
 
@@ -992,12 +1020,64 @@ themeToggle.addEventListener('click', () => {
 });
 
 /* ══════════════════════════════════════════════════════════
-   SUBMIT
+   SUBMIT → FORMSPREE
+   Substitui YOUR_FORM_ID pelo ID obtido em formspree.io
 ══════════════════════════════════════════════════════════ */
-function submeter() {
-  document.getElementById('form-area').style.display = 'none';
-  const s = document.getElementById('success');
-  s.style.display = 'block';
+const FORMSPREE_ID = 'mqegqgyp';
+
+async function submeter() {
+  const btn  = document.getElementById('btn-submit');
+  const form = document.getElementById('questionnaire-form');
+  const err  = document.getElementById('form-error');
+
+  // Esconde erro anterior
+  if (err) err.style.display = 'none';
+
+  // Estado de loading
+  btn.disabled    = true;
+  btn.textContent = 'A ENVIAR…';
+
+  try {
+    const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      method:  'POST',
+      body:    new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (res.ok) {
+      // Sucesso — mostra ecrã de confirmação
+      document.getElementById('form-area').style.display = 'none';
+      document.getElementById('success').style.display   = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Erro do servidor Formspree
+      const json = await res.json().catch(() => ({}));
+      const msg  = json.errors
+        ? json.errors.map(e => e.message).join(' · ')
+        : 'Erro ao enviar. Tenta novamente.';
+      mostrarErro(msg);
+      btn.disabled    = false;
+      btn.textContent = 'ENVIAR RESPOSTAS';
+    }
+
+  } catch (_) {
+    // Erro de rede / sem ligação
+    mostrarErro('Sem ligação à internet. Verifica e tenta novamente.');
+    btn.disabled    = false;
+    btn.textContent = 'ENVIAR RESPOSTAS';
+  }
+}
+
+function mostrarErro(msg) {
+  let el = document.getElementById('form-error');
+  if (!el) {
+    el           = document.createElement('p');
+    el.id        = 'form-error';
+    el.className = 'form-error';
+    document.querySelector('.submit-area').prepend(el);
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
 }
 </script>
 </body>
