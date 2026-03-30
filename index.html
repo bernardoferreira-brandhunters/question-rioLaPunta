@@ -559,6 +559,34 @@
     margin: 0 auto;
   }
 
+  .btn-reset {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--primary);
+    background: transparent;
+    border: 2px solid var(--primary);
+    border-radius: 100px;
+    padding: 14px 36px;
+    cursor: pointer;
+    margin-top: 32px;
+    transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.15s;
+  }
+
+  .btn-reset:hover {
+    background: var(--primary);
+    color: var(--bg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(17,17,17,0.18);
+  }
+
+  body[data-theme="dark"] .btn-reset:hover {
+    box-shadow: 0 6px 24px rgba(244,244,244,0.1);
+  }
+
+  .btn-reset:active { transform: translateY(0); box-shadow: none; }
+
   /* ─── NOTE ───────────────────────────────────────────── */
   .note {
     font-family: 'IBM Plex Mono', monospace;
@@ -727,6 +755,7 @@
     <span class="success-icon">🎉</span>
     <h2>Obrigado pela tua resposta!</h2>
     <p>A tua opinião vai ajudar marcas a criar conteúdo que faça sentido para a tua geração.</p>
+    <button class="btn-reset" onclick="resetForm()">VOLTAR AO INÍCIO</button>
   </div>
 </div>
 
@@ -1078,6 +1107,54 @@ function mostrarErro(msg) {
   }
   el.textContent = msg;
   el.style.display = 'block';
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESET — Volta ao início com o formulário completamente vazio
+══════════════════════════════════════════════════════════ */
+function resetForm() {
+  // 1. Troca ecrãs
+  document.getElementById('success').style.display   = 'none';
+  document.getElementById('form-area').style.display = 'block';
+
+  // 2. Limpa todos os inputs nativos (radio, checkbox, text, range, textarea)
+  document.getElementById('questionnaire-form').reset();
+
+  // 3. Remove classes visuais de seleção (.selected em pills e checks)
+  document.querySelectorAll('.opt-label.selected, .check-label.selected')
+    .forEach(el => el.classList.remove('selected'));
+
+  // 4. Esconde todos os campos "Outro, qual:" que possam estar visíveis
+  document.querySelectorAll('.other-field').forEach(el => {
+    el.classList.remove('visible');
+    const input = el.querySelector('input[type="text"]');
+    if (input) input.value = '';
+  });
+
+  // 5. Repõe o slider para o valor por defeito (2h)
+  const slider = document.getElementById('horas');
+  const sliderVal = document.getElementById('horas-val');
+  if (slider && sliderVal) {
+    slider.value = 2;
+    sliderVal.textContent = '2h';
+    delete slider.dataset.touched;
+  }
+
+  // 6. Repõe a barra de progresso
+  document.getElementById('prog').style.width = '0%';
+  document.getElementById('prog-label').textContent = '0 / ' + TOTAL;
+
+  // 7. Repõe o botão de envio
+  const btn = document.getElementById('btn-submit');
+  btn.disabled    = false;
+  btn.textContent = 'ENVIAR RESPOSTAS';
+
+  // 8. Esconde erro anterior, se existir
+  const err = document.getElementById('form-error');
+  if (err) err.style.display = 'none';
+
+  // 9. Volta ao topo
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 </body>
