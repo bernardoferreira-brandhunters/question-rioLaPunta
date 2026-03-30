@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inquérito — Redes Sociais & Geração Z</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --accent: #c8ff00;
+    --accent2: #ff3cac;
+    --accent3: #7b61ff;
+    --text: #f0f0f5;
+    --muted: #7a7a95;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.6;
+  }
+  .blob { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.12; pointer-events: none; z-index: 0; }
+  .blob-1 { width: 500px; height: 500px; background: var(--accent3); top: -100px; right: -100px; }
+  .blob-2 { width: 400px; height: 400px; background: var(--accent2); bottom: 10%; left: -150px; }
+  .blob-3 { width: 300px; height: 300px; background: var(--accent); top: 50%; left: 40%; }
+  .container { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 60px 24px 80px; }
+  .header { margin-bottom: 56px; animation: fadeUp 0.7s ease both; }
+  .tag {
+    display: inline-block;
+    background: rgba(200,255,0,0.1);
+    border: 1px solid rgba(200,255,0,0.25);
+    color: var(--accent); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 6px 14px; border-radius: 100px; margin-bottom: 24px;
+  }
+  h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.4rem,6vw,3.8rem); font-weight: 800; line-height: 1.05; margin-bottom: 16px; }
+  h1 span { background: linear-gradient(90deg,var(--accent2),var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .subtitle { color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 520px; }
+  .progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; animation: fadeUp 0.7s 0.1s ease both; }
+  .progress-bar { flex: 1; height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg,var(--accent3),var(--accent)); border-radius: 100px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+  .progress-label { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+  .section { margin-bottom: 12px; animation: fadeUp 0.6s ease both; }
+  .section-label { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent3); margin-bottom: 20px; padding-left: 2px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 30px; margin-bottom: 16px; transition: border-color 0.2s; }
+  .card:hover { border-color: #3a3a52; }
+  .question { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 20px; line-height: 1.45; }
+  .question .req { color: var(--accent2); margin-left: 3px; }
+  .options { display: flex; flex-wrap: wrap; gap: 10px; }
+  .opt-label { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 100px; border: 1.5px solid var(--border); background: var(--surface); font-size: 13.5px; color: #ccc; transition: all 0.18s ease; user-select: none; }
+  .opt-label:hover { border-color: var(--accent3); color: var(--text); background: rgba(123,97,255,0.08); }
+  .opt-label input { display: none; }
+  .opt-label.selected { border-color: var(--accent3); background: rgba(123,97,255,0.18); color: var(--text); font-weight: 500; }
+  .scale-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .scale-item { text-align: center; cursor: pointer; }
+  .scale-item input { display: none; }
+  .scale-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface); min-width: 56px; transition: all 0.18s ease; cursor: pointer; }
+  .scale-btn .emoji { font-size: 22px; }
+  .scale-btn .num { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); }
+  .scale-item input:checked + .scale-btn { border-color: var(--accent); background: rgba(200,255,0,0.1); }
+  .scale-item input:checked + .scale-btn .num { color: var(--accent); }
+  textarea, input[type="text"], input[type="number"], select { width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 14px 16px; outline: none; transition: border-color 0.2s; resize: vertical; }
+  textarea:focus, input[type="text"]:focus, select:focus { border-color: var(--accent3); }
+  select { cursor: pointer; appearance: none; }
+  .select-wrap { position: relative; }
+  .select-wrap::after { content: '▾'; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .slider-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .slider-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 100px; background: var(--border); outline: none; padding: 0; border: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent3); cursor: pointer; box-shadow: 0 0 0 4px rgba(123,97,255,0.2); transition: box-shadow 0.2s; }
+  input[type="range"]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 7px rgba(123,97,255,0.25); }
+  .slider-value { text-align: center; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 22px; color: var(--accent3); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
+  .check-label { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); cursor: pointer; font-size: 13.5px; color: #ccc; transition: all 0.18s; user-select: none; }
+  .check-label:hover { border-color: var(--accent3); color: var(--text); }
+  .check-label input { display: none; }
+  .check-box { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; transition: all 0.15s; }
+  .check-label.selected { border-color: var(--accent3); background: rgba(123,97,255,0.12); color: var(--text); }
+  .check-label.selected .check-box { background: var(--accent3); border-color: var(--accent3); }
+  .submit-area { margin-top: 40px; text-align: center; }
+  .btn-submit { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.03em; background: var(--accent); color: #0a0a0f; border: none; border-radius: 100px; padding: 18px 48px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 0 40px rgba(200,255,0,0.2); }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(200,255,0,0.35); }
+  .btn-submit:active { transform: translateY(0); }
+  .success-screen { display: none; text-align: center; padding: 80px 20px; animation: fadeUp 0.6s ease both; }
+  .success-icon { font-size: 60px; margin-bottom: 24px; }
+  .success-screen h2 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+  .success-screen p { color: var(--muted); font-size: 15px; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<div class="container">
+  <div id="form-area">
+    <div class="header">
+      <div class="tag">✦ Estudo de Audiências 2025</div>
+      <h1>As tuas redes.<br><span>O teu mundo.</span></h1>
+      <p class="subtitle">Este inquérito é anónimo e demora cerca de 4 minutos. As tuas respostas ajudam marcas a criar conteúdo que faça mesmo sentido para ti.</p>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+      <div class="progress-label" id="prog-label">0 / 20</div>
+    </div>
+
+    <!-- SECÇÃO 1 -->
+    <div class="section">
+      <div class="section-label">01 — Perfil</div>
+      <div class="card">
+        <div class="question">Qual é a tua idade?<span class="req">*</span></div>
+        <div class="options" id="idade-opts"></div>
+      </div>
+      <div class="card">
+        <div class="question">Com que género te identificas?<span class="req">*</span></div>
+        <div class="options" id="genero-opts"></div>
+      </div>
+    </div>
+
+    <!-- SECÇÃO 2 -->
+    <div class="section">
+      <div class="section-label">02 — Hábitos de Consumo</div>
+      <div class="card">
+        <div class="question">Quantas horas por dia passas nas redes sociais?<span class="req">*</span></div>
+        <div class="slider-wrap">
+          <div class="slider-value" id="horas-val">2h</div>
+          <input type="range" id="horas" name="horas_dia" min="0" max="10" step="0.5" value="2">
+          <div class="slider-labels"><span>Quase nada</span><span>+10h</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="question">Em que momento do dia usas mais as redes?<span class="req">*</span></div>
+        <div class="grid-2" id="momento"></div>
+      </div>
+      <div class="card">
+        <div class="question">Quais redes sociais usas regularmente?<span class="req">*</span></div>
+        <div class="grid-2" id="redes"></div>
+      </div>
+      <div class="card">
+        <div class="question">Qual é a tua rede principal — onde passas mais tempo?<span class="req">*</span></div>
+        <div class="options" id="rede-principal"></div>
+      </div>
+    </div>
+
+    <!-- SECÇÃO 3 -->
+    <div class="section">
+      <div class="section-label">03 — Tipo de Conteúdo</div>
+      <div class="card">
+        <div class="question">Que tipo de conteúdo consomes mais?<span class="req">*</span></div>
+        <div class="grid-2" id="tipo-conteudo"></div>
+      </div>
+      <div class="card">
+        <div class="question">Que formato de conteúdo preferes?<span class="req">*</span></div>
+        <div class="options" id="formato"></div>
+      </div>
+      <div class="card">
+        <div class="question">Com que frequência partilhas conteúdo criado por ti?<span class="req">*</span></div>
+        <div class="options" id="partilha-opts"></div>
+      </div>
+    </div>
+
+    <!-- SECÇÃO 4 -->
+    <div class="section">
+      <div class="section-label">04 — Marcas & Publicidade</div>
+      <div class="card">
+        <div class="question">Quando uma marca aparece no teu feed, o que te faz parar para ver?<span class="req">*</span></div>
+        <div class="grid-2" id="para-ver"></div>
+      </div>
+      <div class="card">
+        <div class="question">Já compraste ou consideraste comprar um produto que viste nas redes?<span class="req">*</span></div>
+        <div class="options" id="compra-opts"></div>
+      </div>
+      <div class="card">
+        <div class="question">O que te faz seguir uma marca nas redes sociais?<span class="req">*</span></div>
+        <div class="grid-2" id="seguir-marca"></div>
+      </div>
+      <div class="card">
+        <div class="question">Como te sentes em relação a publicidade nas redes sociais?<span class="req">*</span></div>
+        <div class="scale-row" id="sentimento-pub"></div>
+      </div>
+      <div class="card">
+        <div class="question">Que tipo de influencer te influencia mais?<span class="req">*</span></div>
+        <div class="options" id="influencer-opts"></div>
+      </div>
+    </div>
+
+    <!-- SECÇÃO 5 -->
+    <div class="section">
+      <div class="section-label">05 — Tendências & Identidade</div>
+      <div class="card">
+        <div class="question">Que temas/áreas te interessam mais nas redes sociais?<span class="req">*</span></div>
+        <div class="grid-2" id="temas"></div>
+      </div>
+      <div class="card">
+        <div class="question">Já descobriste uma tendência nas redes antes de ela "explodir"?<span class="req">*</span></div>
+        <div class="options" id="tendencia-opts"></div>
+      </div>
+      <div class="card">
+        <div class="question">Numa escala de 1 a 5, quanto é que as redes sociais influenciam as tuas escolhas de compra?<span class="req">*</span></div>
+        <div class="scale-row" id="influencia-compra"></div>
+      </div>
+      <div class="card">
+        <div class="question">Há algo que marcas nunca devem fazer nas redes para atingir jovens? <span style="color:var(--muted);font-weight:400">(opcional)</span></div>
+        <textarea name="evitar" rows="3" placeholder="Escreve livremente…"></textarea>
+      </div>
+      <div class="card">
+        <div class="question">O que tornaria um conteúdo de marca irresistível para ti? <span style="color:var(--muted);font-weight:400">(opcional)</span></div>
+        <textarea name="irresistivel" rows="3" placeholder="Escreve livremente…"></textarea>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <p class="note" style="margin-bottom:16px;">As tuas respostas são anónimas e usadas apenas para fins de investigação estratégica.</p>
+      <button class="btn-submit" onclick="submeter()">Enviar respostas ✦</button>
+    </div>
+  </div>
+
+  <div class="success-screen" id="success">
+    <div class="success-icon">🎉</div>
+    <h2>Obrigado pela tua resposta!</h2>
+    <p>A tua opinião vai ajudar marcas a criar conteúdo que faça sentido para a tua geração.</p>
+  </div>
+</div>
+
+<script>
+function makePills(containerId, items, radioName) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  items.forEach(item => {
+    const label = document.createElement('label');
+    label.className = 'opt-label';
+    const inp = document.createElement('input');
+    inp.type = 'radio';
+    inp.name = radioName || containerId;
+    inp.value = item;
+    label.appendChild(inp);
+    label.appendChild(document.createTextNode(item));
+    inp.addEventListener('change', () => {
+      el.querySelectorAll('.opt-label').forEach(l => l.classList.remove('selected'));
+      label.classList.add('selected');
+      updateProgress();
+    });
+    el.appendChild(label);
+  });
+}
+
+function makeChecks(containerId, items) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  items.forEach(item => {
+    const label = document.createElement('label');
+    label.className = 'check-label';
+    const inp = document.createElement('input');
+    inp.type = 'checkbox';
+    inp.name = containerId;
+    inp.value = item;
+    const box = document.createElement('span');
+    box.className = 'check-box';
+    box.textContent = '✓';
+    label.appendChild(inp);
+    label.appendChild(box);
+    label.appendChild(document.createTextNode(item));
+    inp.addEventListener('change', () => {
+      label.classList.toggle('selected', inp.checked);
+      updateProgress();
+    });
+    el.appendChild(label);
+  });
+}
+
+function makeScale(containerId, emojis, labels) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  emojis.forEach((em, i) => {
+    const lbl = document.createElement('label');
+    lbl.className = 'scale-item';
+    const inp = document.createElement('input');
+    inp.type = 'radio';
+    inp.name = containerId;
+    inp.value = i + 1;
+    const btn = document.createElement('div');
+    btn.className = 'scale-btn';
+    btn.innerHTML = `<span class="emoji">${em}</span><span class="num">${labels[i]}</span>`;
+    inp.addEventListener('change', updateProgress);
+    lbl.appendChild(inp);
+    lbl.appendChild(btn);
+    el.appendChild(lbl);
+  });
+}
+
+// Build all fields
+makePills('idade-opts', ['17 anos','18 anos','19 anos'], 'idade');
+makePills('genero-opts', ['Feminino','Masculino','Não-binário','Prefiro não dizer'], 'genero');
+makeChecks('momento', ['De manhã ao acordar','Durante as aulas/trabalho','Ao almoço','À tarde','À noite','Na cama antes de dormir']);
+makeChecks('redes', ['Instagram','TikTok','YouTube','Twitter / X','Snapchat','Pinterest','BeReal','LinkedIn','Discord','Twitch']);
+makePills('rede-principal', ['Instagram','TikTok','YouTube','Twitter/X','Snapchat','Discord','Outra'], 'rede_principal');
+makeChecks('tipo-conteudo', ['Humor / Memes','Música','Desporto','Moda & Estilo','Beleza & Skincare','Gaming','Viagens','Tecnologia','Política / Atualidade','Lifestyle','Arte & Criatividade','Culinária']);
+makePills('formato', ['Reels / TikToks','Stories','Posts estáticos','Vídeos longos','Lives','Podcasts / Áudio','Threads / Tweets'], 'formato');
+makePills('partilha-opts', ['Diariamente','Semanalmente','Raramente','Nunca'], 'partilha');
+makeChecks('para-ver', ['Visual impactante','Música que conheço','Humor ou ironia','Produto que me interessa','Influencer que sigo','Promoção / desconto','Conteúdo criativo/inesperado','Causa social']);
+makePills('compra-opts', ['✅ Sim, já comprei','🤔 Só considerei','❌ Não'], 'compra');
+makeChecks('seguir-marca', ['Conteúdo divertido / criativo','Descontos exclusivos','Produtos que uso / gosto','Influencers que sigo','Valores da marca','Tendências que partilham','Concursos / sorteios']);
+makeScale('sentimento-pub', ['🤮','😒','😐','😏','🤩'], ['Odeio','Irrita','Neutral','OK','Adoro']);
+makePills('influencer-opts', ['Mega (>1M seguidores)','Macro (100K–1M)','Micro (10K–100K)','Nano (<10K / amigos)','Nenhum'], 'influencer');
+makeChecks('temas', ['Moda','Beleza','Música','Gaming','Desporto','Viagens','Tecnologia','Saúde mental','Sustentabilidade','Gastronomia','Cinema & Séries','Cultura & Arte']);
+makePills('tendencia-opts', ['🚀 Sim, muitas vezes','Às vezes','Raramente / Não'], 'tendencia');
+makeScale('influencia-compra', ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'], ['Nada','Pouco','Médio','Muito','Imenso']);
+
+// Slider
+const slider = document.getElementById('horas');
+const sliderVal = document.getElementById('horas-val');
+slider.addEventListener('input', () => {
+  const v = parseFloat(slider.value);
+  sliderVal.textContent = v === 0 ? '< 30 min' : v + 'h';
+  slider.dataset.touched = '1';
+  updateProgress();
+});
+
+const TOTAL = 20;
+function countAnswered() {
+  let n = 0;
+  ['idade','genero','rede_principal','formato','partilha','compra','influencer','tendencia'].forEach(name => {
+    if (document.querySelector(`input[name="${name}"]:checked`)) n++;
+  });
+  ['momento','redes','tipo-conteudo','para-ver','seguir-marca','temas'].forEach(name => {
+    if (document.querySelector(`input[name="${name}"]:checked`)) n++;
+  });
+  ['sentimento-pub','influencia-compra'].forEach(name => {
+    if (document.querySelector(`input[name="${name}"]:checked`)) n++;
+  });
+  if (slider.dataset.touched) n++;
+  return Math.min(n, TOTAL);
+}
+
+function updateProgress() {
+  const done = countAnswered();
+  document.getElementById('prog').style.width = (done / TOTAL * 100) + '%';
+  document.getElementById('prog-label').textContent = done + ' / ' + TOTAL;
+}
+
+function submeter() {
+  document.getElementById('form-area').style.display = 'none';
+  const s = document.getElementById('success');
+  s.style.display = 'block';
+}
+</script>
+</body>
+</html>
