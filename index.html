@@ -6,23 +6,59 @@
 <title>Questionário Redes Sociais — Brandhunters</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
-  /* ─── BRAND TOKENS ─────────────────────────────────── */
+  /* ─── BRAND TOKENS — LIGHT ──────────────────────────── */
   :root {
-    --bg:           #f4f4f4;   /* Brandhunters off-white */
+    --bg:           #f4f4f4;
     --surface:      #ffffff;
     --card:         #ffffff;
     --border:       #e0e0e0;
     --border-hover: #999999;
-    --primary:      #111111;   /* Brandhunters black */
+    --primary:      #111111;
     --text:         #111111;
     --muted:        #888888;
     --muted-light:  #b8b8b8;
     --radius:       12px;
     --radius-pill:  100px;
+    --selected-bg:  #111111;
+    --selected-fg:  #ffffff;
+    --selected-sub: rgba(255,255,255,0.6);
+    --check-inner:  rgba(255,255,255,0.15);
+    --check-border: rgba(255,255,255,0.3);
+  }
+
+  /* ─── BRAND TOKENS — DARK ───────────────────────────── */
+  body[data-theme="dark"] {
+    --bg:           #111111;
+    --surface:      #191919;
+    --card:         #191919;
+    --border:       #2e2e2e;
+    --border-hover: #555555;
+    --primary:      #f4f4f4;
+    --text:         #f4f4f4;
+    --muted:        #777777;
+    --muted-light:  #444444;
+    --selected-bg:  #f4f4f4;
+    --selected-fg:  #111111;
+    --selected-sub: rgba(17,17,17,0.6);
+    --check-inner:  rgba(17,17,17,0.1);
+    --check-border: rgba(17,17,17,0.2);
   }
 
   /* ─── RESET ─────────────────────────────────────────── */
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ─── THEME TRANSITION ───────────────────────────────── */
+  body, .card, .opt-label, .check-label, .scale-btn,
+  .btn-submit, textarea, input[type="text"], input[type="range"],
+  .progress-bar, .progress-fill, .slider-value, .theme-toggle,
+  .brand-tag, h1, .subtitle, .question, .note,
+  .progress-label, .section-label, .other-field input {
+    transition:
+      background-color 0.3s ease,
+      color           0.3s ease,
+      border-color    0.3s ease,
+      box-shadow      0.3s ease;
+  }
 
   body {
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -31,6 +67,32 @@
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── THEME TOGGLE ───────────────────────────────────── */
+  .theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
   }
 
   /* ─── LAYOUT ─────────────────────────────────────────── */
@@ -67,6 +129,7 @@
     border-radius: 50%;
     background: var(--primary);
     flex-shrink: 0;
+    transition: background-color 0.3s ease;
   }
 
   h1 {
@@ -108,7 +171,9 @@
     height: 100%;
     background: var(--primary);
     border-radius: var(--radius-pill);
-    transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.3s ease;
     width: 0%;
   }
 
@@ -145,12 +210,9 @@
     border-radius: var(--radius);
     padding: 28px 28px;
     margin-bottom: 6px;
-    transition: border-color 0.2s ease;
   }
 
-  .card:hover {
-    border-color: var(--border-hover);
-  }
+  .card:hover { border-color: var(--border-hover); }
 
   .question {
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -187,7 +249,6 @@
     font-size: 13px;
     font-weight: 500;
     color: var(--muted);
-    transition: all 0.15s ease;
     user-select: none;
   }
 
@@ -200,9 +261,9 @@
   .opt-label input { display: none; }
 
   .opt-label.selected {
-    border-color: var(--primary);
-    background: var(--primary);
-    color: #ffffff;
+    border-color: var(--selected-bg);
+    background: var(--selected-bg);
+    color: var(--selected-fg);
     font-weight: 600;
   }
 
@@ -213,11 +274,7 @@
     flex-wrap: wrap;
   }
 
-  .scale-item {
-    text-align: center;
-    cursor: pointer;
-  }
-
+  .scale-item { text-align: center; cursor: pointer; }
   .scale-item input { display: none; }
 
   .scale-btn {
@@ -230,7 +287,6 @@
     border: 1px solid var(--border);
     background: var(--bg);
     min-width: 56px;
-    transition: all 0.15s ease;
     cursor: pointer;
   }
 
@@ -245,16 +301,12 @@
   }
 
   .scale-item input:checked + .scale-btn {
-    border-color: var(--primary);
-    background: var(--primary);
-  }
-
-  .scale-item input:checked + .scale-btn .emoji {
-    filter: grayscale(0);
+    border-color: var(--selected-bg);
+    background: var(--selected-bg);
   }
 
   .scale-item input:checked + .scale-btn .num {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--selected-sub);
   }
 
   /* ─── TEXT INPUTS ────────────────────────────────────── */
@@ -272,25 +324,19 @@
     font-weight: 400;
     padding: 13px 16px;
     outline: none;
-    transition: border-color 0.2s;
     resize: vertical;
   }
 
   textarea:focus,
   input[type="text"]:focus,
-  select:focus {
-    border-color: var(--primary);
-  }
+  select:focus { border-color: var(--primary); }
 
   textarea::placeholder,
-  input::placeholder {
-    color: var(--muted-light);
-  }
+  input::placeholder { color: var(--muted-light); }
 
   select { cursor: pointer; appearance: none; }
 
   .select-wrap { position: relative; }
-
   .select-wrap::after {
     content: '▾';
     position: absolute;
@@ -302,12 +348,26 @@
     font-size: 13px;
   }
 
-  /* ─── SLIDER ─────────────────────────────────────────── */
-  .slider-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  /* ─── "OUTRO" DYNAMIC FIELD ──────────────────────────── */
+  .other-field {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-top: 0;
+    transition:
+      max-height 0.3s ease,
+      opacity    0.25s ease,
+      margin-top 0.3s ease;
   }
+
+  .other-field.visible {
+    max-height: 68px;
+    opacity: 1;
+    margin-top: 10px;
+  }
+
+  /* ─── SLIDER ─────────────────────────────────────────── */
+  .slider-wrap { display: flex; flex-direction: column; gap: 12px; }
 
   .slider-labels {
     display: flex;
@@ -337,12 +397,20 @@
     border-radius: 50%;
     background: var(--primary);
     cursor: pointer;
-    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
-    transition: box-shadow 0.2s;
+    box-shadow: 0 0 0 3px rgba(17,17,17,0.08);
+    transition: box-shadow 0.2s, background-color 0.3s;
   }
 
   input[type="range"]::-webkit-slider-thumb:hover {
-    box-shadow: 0 0 0 7px rgba(17, 17, 17, 0.1);
+    box-shadow: 0 0 0 7px rgba(17,17,17,0.1);
+  }
+
+  body[data-theme="dark"] input[type="range"]::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(244,244,244,0.08);
+  }
+
+  body[data-theme="dark"] input[type="range"]::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 7px rgba(244,244,244,0.1);
   }
 
   .slider-value {
@@ -375,7 +443,6 @@
     font-size: 13px;
     font-weight: 500;
     color: var(--muted);
-    transition: all 0.15s ease;
     user-select: none;
   }
 
@@ -402,22 +469,24 @@
   }
 
   .check-label.selected {
-    border-color: var(--primary);
-    background: var(--primary);
-    color: #ffffff;
+    border-color: var(--selected-bg);
+    background: var(--selected-bg);
+    color: var(--selected-fg);
   }
 
   .check-label.selected .check-box {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: #ffffff;
+    background: var(--check-inner);
+    border-color: var(--check-border);
+    color: var(--selected-fg);
+  }
+
+  /* "Outro" check — full-width, slightly distinct */
+  .check-label-other {
+    margin-top: 6px;
   }
 
   /* ─── SUBMIT ─────────────────────────────────────────── */
-  .submit-area {
-    margin-top: 52px;
-    text-align: center;
-  }
+  .submit-area { margin-top: 52px; text-align: center; }
 
   .btn-submit {
     font-family: 'IBM Plex Mono', monospace;
@@ -426,23 +495,23 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     background: var(--primary);
-    color: #ffffff;
+    color: var(--bg);
     border: none;
     border-radius: var(--radius-pill);
     padding: 18px 56px;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
   .btn-submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(17, 17, 17, 0.18);
+    box-shadow: 0 6px 24px rgba(17,17,17,0.18);
   }
 
-  .btn-submit:active {
-    transform: translateY(0);
-    box-shadow: none;
+  body[data-theme="dark"] .btn-submit:hover {
+    box-shadow: 0 6px 24px rgba(244,244,244,0.1);
   }
+
+  .btn-submit:active { transform: translateY(0); box-shadow: none; }
 
   /* ─── SUCCESS ────────────────────────────────────────── */
   .success-screen {
@@ -452,11 +521,7 @@
     animation: fadeUp 0.6s ease both;
   }
 
-  .success-icon {
-    font-size: 52px;
-    margin-bottom: 28px;
-    display: block;
-  }
+  .success-icon { font-size: 52px; margin-bottom: 28px; display: block; }
 
   .success-screen h2 {
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -486,11 +551,12 @@
 
   /* ─── RESPONSIVE ─────────────────────────────────────── */
   @media (max-width: 560px) {
-    .container { padding: 40px 16px 80px; }
-    .card { padding: 20px 18px; }
-    .grid-2 { grid-template-columns: 1fr; }
-    h1 { letter-spacing: -0.02em; }
-    .scale-btn { min-width: 48px; padding: 12px 10px; }
+    .container  { padding: 40px 16px 80px; }
+    .card       { padding: 20px 18px; }
+    .grid-2     { grid-template-columns: 1fr; }
+    h1          { letter-spacing: -0.02em; }
+    .scale-btn  { min-width: 48px; padding: 12px 10px; }
+    .theme-toggle { top: 14px; right: 14px; }
   }
 
   /* ─── ANIMATION ──────────────────────────────────────── */
@@ -501,6 +567,11 @@
 </style>
 </head>
 <body>
+
+<!-- DARK MODE TOGGLE -->
+<button class="theme-toggle" id="theme-toggle" aria-label="Alternar modo escuro">
+  <span class="toggle-icon">☾</span>
+</button>
 
 <div class="container">
   <div id="form-area">
@@ -549,10 +620,12 @@
       <div class="card">
         <div class="question">Quais redes sociais usas regularmente?<span class="req">*</span></div>
         <div class="grid-2" id="redes"></div>
+        <!-- "Outro" option + field injected here by JS -->
       </div>
       <div class="card">
         <div class="question">Qual é a tua rede principal — onde passas mais tempo?<span class="req">*</span></div>
         <div class="options" id="rede-principal"></div>
+        <!-- "Outro" option + field injected here by JS -->
       </div>
     </div>
 
@@ -630,30 +703,31 @@
 </div>
 
 <script>
-function makePills(containerId, items, radioName) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  items.forEach(item => {
-    const label = document.createElement('label');
-    label.className = 'opt-label';
-    const inp = document.createElement('input');
-    inp.type = 'radio';
-    inp.name = radioName || containerId;
-    inp.value = item;
-    label.appendChild(inp);
-    label.appendChild(document.createTextNode(item));
-    inp.addEventListener('change', () => {
-      el.querySelectorAll('.opt-label').forEach(l => l.classList.remove('selected'));
-      label.classList.add('selected');
-      updateProgress();
-    });
-    el.appendChild(label);
-  });
-}
+/* ══════════════════════════════════════════════════════════
+   SHARED DATA
+══════════════════════════════════════════════════════════ */
 
-function makeChecks(containerId, items) {
+// Lista unificada usada em "redes" e "rede-principal"
+const REDES_LIST = [
+  'Instagram','TikTok','YouTube','Twitter / X',
+  'Snapchat','Pinterest','BeReal','LinkedIn',
+  'Discord','Twitch','Reddit','Threads'
+];
+
+/* ══════════════════════════════════════════════════════════
+   BUILDER HELPERS
+   opts = { withOther: bool, otherPlaceholder: string }
+══════════════════════════════════════════════════════════ */
+
+/**
+ * Cria um grupo de checkboxes.
+ * Se opts.withOther = true, adiciona "Outro, qual:" full-width
+ * + campo de texto dinâmico no card.
+ */
+function makeChecks(containerId, items, opts = {}) {
   const el = document.getElementById(containerId);
   if (!el) return;
+
   items.forEach(item => {
     const label = document.createElement('label');
     label.className = 'check-label';
@@ -673,8 +747,106 @@ function makeChecks(containerId, items) {
     });
     el.appendChild(label);
   });
+
+  if (opts.withOther) {
+    const otherId = containerId + '-other';
+    const placeholder = opts.otherPlaceholder || 'Especifica…';
+
+    // "Outro, qual:" — full-width, fora do grid
+    const outrLabel = document.createElement('label');
+    outrLabel.className = 'check-label check-label-other';
+    const outrInp = document.createElement('input');
+    outrInp.type = 'checkbox';
+    outrInp.name = containerId;
+    outrInp.value = 'Outro';
+    const outrBox = document.createElement('span');
+    outrBox.className = 'check-box';
+    outrBox.textContent = '✓';
+    outrLabel.appendChild(outrInp);
+    outrLabel.appendChild(outrBox);
+    outrLabel.appendChild(document.createTextNode('Outro, qual:'));
+
+    outrInp.addEventListener('change', () => {
+      outrLabel.classList.toggle('selected', outrInp.checked);
+      const field = document.getElementById(otherId);
+      if (field) field.classList.toggle('visible', outrInp.checked);
+      updateProgress();
+    });
+
+    // Inject into the card (parent of el)
+    const card = el.parentNode;
+    card.appendChild(outrLabel);
+
+    // Text input that appears when "Outro" is checked
+    const otherDiv = document.createElement('div');
+    otherDiv.className = 'other-field';
+    otherDiv.id = otherId;
+    const otherInput = document.createElement('input');
+    otherInput.type = 'text';
+    otherInput.name = containerId + '_outro';
+    otherInput.placeholder = placeholder;
+    otherDiv.appendChild(otherInput);
+    card.appendChild(otherDiv);
+  }
 }
 
+/**
+ * Cria um grupo de radio pills.
+ * Se opts.withOther = true, adiciona pill "Outro"
+ * + campo de texto dinâmico no card.
+ */
+function makePills(containerId, items, radioName, opts = {}) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  const allItems = opts.withOther ? [...items, 'Outro'] : items;
+
+  allItems.forEach(item => {
+    const isOther = item === 'Outro';
+    const label = document.createElement('label');
+    label.className = 'opt-label';
+    const inp = document.createElement('input');
+    inp.type = 'radio';
+    inp.name = radioName || containerId;
+    inp.value = item;
+    label.appendChild(inp);
+    label.appendChild(document.createTextNode(item));
+
+    inp.addEventListener('change', () => {
+      el.querySelectorAll('.opt-label').forEach(l => l.classList.remove('selected'));
+      label.classList.add('selected');
+      updateProgress();
+
+      if (opts.withOther) {
+        const field = document.getElementById(containerId + '-other');
+        if (field) field.classList.toggle('visible', isOther);
+      }
+    });
+
+    el.appendChild(label);
+  });
+
+  if (opts.withOther) {
+    const otherId = containerId + '-other';
+    const placeholder = opts.otherPlaceholder || 'Qual?';
+
+    const otherDiv = document.createElement('div');
+    otherDiv.className = 'other-field';
+    otherDiv.id = otherId;
+    const otherInput = document.createElement('input');
+    otherInput.type = 'text';
+    otherInput.name = (radioName || containerId) + '_outro';
+    otherInput.placeholder = placeholder;
+    otherDiv.appendChild(otherInput);
+
+    // Inject into the card (parent of el)
+    el.parentNode.appendChild(otherDiv);
+  }
+}
+
+/**
+ * Cria uma escala com emojis (sem alterações).
+ */
 function makeScale(containerId, emojis, labels) {
   const el = document.getElementById(containerId);
   if (!el) return;
@@ -695,24 +867,81 @@ function makeScale(containerId, emojis, labels) {
   });
 }
 
-// ── Build all fields ────────────────────────────────────
+/* ══════════════════════════════════════════════════════════
+   BUILD ALL FIELDS
+══════════════════════════════════════════════════════════ */
+
 makePills('idade-opts', ['17 anos','18 anos','19 anos'], 'idade');
 makePills('genero-opts', ['Feminino','Masculino','Não-binário','Prefiro não dizer'], 'genero');
-makeChecks('momento', ['De manhã ao acordar','Durante as aulas/trabalho','Ao almoço','À tarde','À noite','Na cama antes de dormir']);
-makeChecks('redes', ['Instagram','TikTok','YouTube','Twitter / X','Snapchat','Pinterest','BeReal','LinkedIn','Discord','Twitch']);
-makePills('rede-principal', ['Instagram','TikTok','YouTube','Twitter/X','Snapchat','Discord','Outra'], 'rede_principal');
-makeChecks('tipo-conteudo', ['Humor / Memes','Música','Desporto','Moda & Estilo','Beleza & Skincare','Gaming','Viagens','Tecnologia','Política / Atualidade','Lifestyle','Arte & Criatividade','Culinária']);
-makePills('formato', ['Reels / TikToks','Stories','Posts estáticos','Vídeos longos','Lives','Podcasts / Áudio','Threads / Tweets'], 'formato');
-makePills('partilha-opts', ['Diariamente','Semanalmente','Raramente','Nunca'], 'partilha');
-makeChecks('para-ver', ['Visual impactante','Música que conheço','Humor ou ironia','Produto que me interessa','Influencer que sigo','Promoção / desconto','Conteúdo criativo/inesperado','Causa social']);
-makePills('compra-opts', ['✅ Sim, já comprei','🤔 Só considerei','❌ Não'], 'compra');
-makeChecks('seguir-marca', ['Conteúdo divertido / criativo','Descontos exclusivos','Produtos que uso / gosto','Influencers que sigo','Valores da marca','Tendências que partilham','Concursos / sorteios']);
-makeScale('sentimento-pub', ['🤮','😒','😐','😏','🤩'], ['Odeio','Irrita','Neutral','OK','Adoro']);
-makeChecks('temas', ['Moda','Beleza','Música','Gaming','Desporto','Viagens','Tecnologia','Saúde mental','Sustentabilidade','Gastronomia','Cinema & Séries','Cultura & Arte']);
-makeScale('influencia-compra', ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'], ['Nada','Pouco','Médio','Muito','Imenso']);
 
-// ── Slider ──────────────────────────────────────────────
-const slider = document.getElementById('horas');
+makeChecks('momento', [
+  'De manhã ao acordar','Durante as aulas/trabalho',
+  'Ao almoço','À tarde','À noite','Na cama antes de dormir'
+]);
+
+// Redes — lista unificada + "Outro, quais?"
+makeChecks('redes', REDES_LIST, {
+  withOther: true,
+  otherPlaceholder: 'Quais?'
+});
+
+// Rede principal — mesmas opções + "Outro, qual?"
+makePills('rede-principal', REDES_LIST, 'rede_principal', {
+  withOther: true,
+  otherPlaceholder: 'Qual?'
+});
+
+// Tipo de conteúdo — com "Outro"
+makeChecks('tipo-conteudo', [
+  'Humor / Memes','Música','Desporto','Moda & Estilo',
+  'Beleza & Skincare','Gaming','Viagens','Tecnologia',
+  'Política / Atualidade','Lifestyle','Arte & Criatividade','Culinária'
+], { withOther: true });
+
+makePills('formato', [
+  'Reels / TikToks','Stories','Posts estáticos',
+  'Vídeos longos','Lives','Podcasts / Áudio','Threads / Tweets'
+], 'formato');
+
+makePills('partilha-opts', ['Diariamente','Semanalmente','Raramente','Nunca'], 'partilha');
+
+// Para ver — com "Outro"
+makeChecks('para-ver', [
+  'Visual impactante','Música que conheço','Humor ou ironia',
+  'Produto que me interessa','Influencer que sigo',
+  'Promoção / desconto','Conteúdo criativo/inesperado','Causa social'
+], { withOther: true });
+
+makePills('compra-opts', ['✅ Sim, já comprei','🤔 Só considerei','❌ Não'], 'compra');
+
+// Seguir marca — com "Outro"
+makeChecks('seguir-marca', [
+  'Conteúdo divertido / criativo','Descontos exclusivos',
+  'Produtos que uso / gosto','Influencers que sigo',
+  'Valores da marca','Tendências que partilham','Concursos / sorteios'
+], { withOther: true });
+
+makeScale('sentimento-pub',
+  ['🤮','😒','😐','😏','🤩'],
+  ['Odeio','Irrita','Neutral','OK','Adoro']
+);
+
+// Temas — com "Outro"
+makeChecks('temas', [
+  'Moda','Beleza','Música','Gaming','Desporto','Viagens',
+  'Tecnologia','Saúde mental','Sustentabilidade',
+  'Gastronomia','Cinema & Séries','Cultura & Arte'
+], { withOther: true });
+
+makeScale('influencia-compra',
+  ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'],
+  ['Nada','Pouco','Médio','Muito','Imenso']
+);
+
+/* ══════════════════════════════════════════════════════════
+   SLIDER
+══════════════════════════════════════════════════════════ */
+const slider    = document.getElementById('horas');
 const sliderVal = document.getElementById('horas-val');
 slider.addEventListener('input', () => {
   const v = parseFloat(slider.value);
@@ -721,7 +950,9 @@ slider.addEventListener('input', () => {
   updateProgress();
 });
 
-// ── Progress logic ───────────────────────────────────────
+/* ══════════════════════════════════════════════════════════
+   PROGRESS
+══════════════════════════════════════════════════════════ */
 const TOTAL = 18;
 
 function countAnswered() {
@@ -745,7 +976,24 @@ function updateProgress() {
   document.getElementById('prog-label').textContent = done + ' / ' + TOTAL;
 }
 
-// ── Submit ───────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════════
+   DARK MODE TOGGLE
+══════════════════════════════════════════════════════════ */
+const themeToggle = document.getElementById('theme-toggle');
+const toggleIcon  = themeToggle.querySelector('.toggle-icon');
+let isDark = false;
+
+themeToggle.addEventListener('click', () => {
+  isDark = !isDark;
+  document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  // ☾ = lua (modo claro → clicar para escurecer)
+  // ☀ = sol (modo escuro → clicar para clarear)
+  toggleIcon.textContent = isDark ? '☀' : '☾';
+});
+
+/* ══════════════════════════════════════════════════════════
+   SUBMIT
+══════════════════════════════════════════════════════════ */
 function submeter() {
   document.getElementById('form-area').style.display = 'none';
   const s = document.getElementById('success');
