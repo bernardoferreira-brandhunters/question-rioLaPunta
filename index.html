@@ -696,7 +696,7 @@
       </div>
       <div class="card">
         <div class="question">Que formato de conteúdo preferes?<span class="req">*</span></div>
-        <div class="options" id="formato"></div>
+        <div class="grid-2" id="formato"></div>
       </div>
       <div class="card">
         <div class="question">Com que frequência partilhas conteúdo criado por ti?<span class="req">*</span></div>
@@ -966,10 +966,10 @@ makeChecks('tipo-conteudo', [
   'Política / Atualidade','Lifestyle','Arte & Criatividade','Culinária'
 ], { withOther: true });
 
-makePills('formato', [
+makeChecks('formato', [
   'Reels / TikToks','Stories','Posts estáticos',
   'Vídeos longos','Lives','Podcasts / Áudio','Threads / Tweets'
-], 'formato');
+]);
 
 makePills('partilha-opts', ['Diariamente','Semanalmente','Raramente','Nunca'], 'partilha');
 
@@ -1025,10 +1025,10 @@ const TOTAL = 18;
 
 function countAnswered() {
   let n = 0;
-  ['genero','rede_principal','formato','partilha','compra'].forEach(name => {
+  ['genero','rede_principal','partilha','compra'].forEach(name => {
     if (document.querySelector(`input[name="${name}"]:checked`)) n++;
   });
-  ['momento','redes','tipo-conteudo','para-ver','seguir-marca','temas'].forEach(name => {
+  ['momento','redes','tipo-conteudo','formato','para-ver','seguir-marca','temas'].forEach(name => {
     if (document.querySelector(`input[name="${name}"]:checked`)) n++;
   });
   ['sentimento-pub','influencia-compra'].forEach(name => {
