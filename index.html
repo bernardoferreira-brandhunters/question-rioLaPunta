@@ -648,7 +648,11 @@
       <div class="section-label">01 — Perfil</div>
       <div class="card">
         <div class="question">Qual é a tua idade?<span class="req">*</span></div>
-        <div class="options" id="idade-opts"></div>
+        <div class="slider-wrap">
+          <div class="slider-value" id="idade-val">—</div>
+          <input type="range" id="idade" name="idade" min="16" max="30" step="1" value="16">
+          <div class="slider-labels"><span>16 anos</span><span>30 anos</span></div>
+        </div>
       </div>
       <div class="card">
         <div class="question">Com que género te identificas?<span class="req">*</span></div>
@@ -767,7 +771,7 @@
 // Lista unificada usada em "redes" e "rede-principal"
 const REDES_LIST = [
   'Instagram','TikTok','YouTube','Twitter / X',
-  'Snapchat','Pinterest','BeReal','LinkedIn',
+  'Facebook','Snapchat','Pinterest','BeReal','LinkedIn',
   'Discord','Twitch','Reddit','Threads'
 ];
 
@@ -928,7 +932,14 @@ function makeScale(containerId, emojis, labels) {
    BUILD ALL FIELDS
 ══════════════════════════════════════════════════════════ */
 
-makePills('idade-opts', ['17 anos','18 anos','19 anos'], 'idade');
+// Slider de idade (16–30 anos)
+const idadeSlider = document.getElementById('idade');
+const idadeVal    = document.getElementById('idade-val');
+idadeSlider.addEventListener('input', () => {
+  idadeVal.textContent = idadeSlider.value + ' anos';
+  idadeSlider.dataset.touched = '1';
+  updateProgress();
+});
 makePills('genero-opts', ['Feminino','Masculino','Não-binário','Prefiro não dizer'], 'genero');
 
 makeChecks('momento', [
@@ -1014,7 +1025,7 @@ const TOTAL = 18;
 
 function countAnswered() {
   let n = 0;
-  ['idade','genero','rede_principal','formato','partilha','compra'].forEach(name => {
+  ['genero','rede_principal','formato','partilha','compra'].forEach(name => {
     if (document.querySelector(`input[name="${name}"]:checked`)) n++;
   });
   ['momento','redes','tipo-conteudo','para-ver','seguir-marca','temas'].forEach(name => {
@@ -1023,6 +1034,7 @@ function countAnswered() {
   ['sentimento-pub','influencia-compra'].forEach(name => {
     if (document.querySelector(`input[name="${name}"]:checked`)) n++;
   });
+  if (idadeSlider.dataset.touched) n++;
   if (slider.dataset.touched) n++;
   return Math.min(n, TOTAL);
 }
@@ -1131,13 +1143,20 @@ function resetForm() {
     if (input) input.value = '';
   });
 
-  // 5. Repõe o slider para o valor por defeito (2h)
+  // 5. Repõe os sliders para os valores por defeito
   const slider = document.getElementById('horas');
   const sliderVal = document.getElementById('horas-val');
   if (slider && sliderVal) {
     slider.value = 2;
     sliderVal.textContent = '2h';
     delete slider.dataset.touched;
+  }
+  const idadeSliderEl = document.getElementById('idade');
+  const idadeValEl    = document.getElementById('idade-val');
+  if (idadeSliderEl && idadeValEl) {
+    idadeSliderEl.value = 16;
+    idadeValEl.textContent = '—';
+    delete idadeSliderEl.dataset.touched;
   }
 
   // 6. Repõe a barra de progresso
